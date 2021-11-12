@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "aio-cosmos"
-version = "0.2.1"
+version = "0.2.2"
 description = "Ayncio Client for Azure Cosmos DB"
 authors = ["Grant McDonald <calmseasdev@gmail.com>"]
 keywords = ["azure","cosmos","ayncio","aio","nosql"]
@@ -15,7 +15,7 @@ include = [
 
 [tool.poetry.dependencies]
 python = "^3.7"
-aiohttp = "^3.8.0"
+aiohttp = {version = "^3.8.0", extras = ['speedups']}
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

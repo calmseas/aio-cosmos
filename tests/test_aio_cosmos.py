@@ -8,7 +8,7 @@ from azure.cosmos import PartitionKey, ContainerProxy, CosmosClient as cc
 from uuid import uuid4
 
 def test_version():
-    assert __version__ == '0.1.0'
+    assert __version__ == '0.2.2'
 
 @pytest.mark.asyncio
 async def i_test_list_db():

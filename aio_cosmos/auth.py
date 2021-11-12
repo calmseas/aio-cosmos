@@ -63,8 +63,6 @@ def __get_authorization_token_using_master_key(verb, resource_id_or_fullname, re
         http_date=headers.get(http_constants.HttpHeaders.HttpDate, "").lower(),
     )
 
-    print(f'text for sig:\nSTART\n{text}\nEND')
-
     body = text.encode("utf-8")
     digest = hmac.new(key, body, sha256).digest()
     signature = base64.encodebytes(digest).decode("utf-8")
@@ -74,5 +72,4 @@ def __get_authorization_token_using_master_key(verb, resource_id_or_fullname, re
     sig = "type={type}&ver={ver}&sig={sig}".format(type=master_token, ver=token_version, sig=signature[:-1])
     # -_.!~*'() are valid characters in url, and shouldn't be quoted.
     sig = quote(sig, "-_.!~*'()")
-    print(sig)
     return sig
