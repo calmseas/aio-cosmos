@@ -271,7 +271,7 @@ class CosmosClient:
                               database: str,
                               container: str,
                               query: str,
-                              partition_key: Optional[Any],
+                              partition_key: Optional[Any] = None,
                               enable_cross_partition_query: Optional[bool] = False,
                               session_token: Optional[str] = None) -> AsyncGenerator:
 
@@ -281,7 +281,7 @@ class CosmosClient:
             headers = self._get_headers(http_constants.HttpMethods.Post, f'dbs/{database}/colls/{container}',
                                         'docs', is_query=True, session_token=session_token)
             if enable_cross_partition_query:
-                headers[http_constants.HttpHeaders.EnableCrossPartitionQuery] = True
+                headers[http_constants.HttpHeaders.EnableCrossPartitionQuery] = 'True'
             else:
                 headers[http_constants.HttpHeaders.PartitionKey] = f'["{partition_key}"]'
 

@@ -25,7 +25,7 @@ async def test_create_db():
     endpoint = os.getenv('ENDPOINT')
 
     async with get_client(endpoint, key, raise_on_failure=False) as client:
-        number = 81
+        number = 82
         print(await client.create_database(f'test-db-async-{number}'))
         await client.create_container(f'test-db-async-{number}', 'test-container-async', '/account')
         doc_id = str(uuid4())
@@ -44,15 +44,16 @@ async def test_create_db():
 
         import time
         start = time.time()
-        res = await client.create_documents(f'test-db-async-2-{number}', 'test-container-async', docs)
+        res = await client.create_documents(f'test-db-async-{number}', 'test-container-async', docs)
         print(f'time to save five docs: {time.time() - start}s')
         print(res)
 
-        await client.get_document(f'test-db-async-{number}', 'test-container-async', doc_id=doc_id, partition_key="Account-1")
-        async for doc in client.query_documents(f'test-db-async-{number}', 'test-container-async',
+        res = await client.get_document(f'test-db-async-{number}', 'test-container-async', doc_id=doc_id, partition_key="Account-1")
+        print(f'document from get: {res["data"]}')
+        async for result in client.query_documents(f'test-db-async-{number}', 'test-container-async',
                                                 query="select * from r where r.account = 'Account-1'",
                                                 partition_key="Account-1"):
-            print(f'doc returned by query: {doc}')
+            print(f'doc returned by query: {result["data"]}')
         await client.delete_document(f'test-db-async-{number}', 'test-container-async', doc_id=doc_id, partition_key="Account-1")
         await client.delete_container(f'test-db-async-{number}', 'test-container-async')
         await client.delete_database(f'test-db-async-{number}')

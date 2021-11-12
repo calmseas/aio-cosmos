@@ -1,6 +1,9 @@
 # Mac OS
 .DS_Store
 
+# other venv stuff
+.test*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
