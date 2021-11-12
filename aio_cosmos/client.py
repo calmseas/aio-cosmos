@@ -60,7 +60,7 @@ async def on_request_end(session, trace_config_ctx, params):
 
 class CosmosClient:
 
-    def __init__(self, endpoint: str, master_key: str, debug: bool = True, raise_on_failure: bool = True):
+    def __init__(self, endpoint: str, master_key: str, debug: bool = False, raise_on_failure: bool = True):
         self.endpoint = endpoint if endpoint.endswith('/') else endpoint + '/'
         self.writable_endpoints = [{'databaseAccountEndpoint': self.endpoint}]
         self.readable_endpoints = [{'databaseAccountEndpoint': self.endpoint}]
@@ -227,7 +227,7 @@ class CosmosClient:
 
     async def create_documents(self, database: str,
                                container: str,
-                               json: List[Dict[str, Any]],
+                               json: List[Tuple[Dict[str, Any], Any]],
                                upsert: Optional[bool] = None,
                                indexed: Optional[bool] = None,
                                session_token: Optional[str] = None) -> List[Dict[str, Any]]:

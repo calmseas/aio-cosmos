@@ -75,7 +75,7 @@ async for doc in client.query_documents(f'database-name', 'container-name',
 ### Concurrent Writes / Multiple Documents
 
 The client provides the ability to issue concurrent document writes using asyncio/aiohttp. Each document is represented
-by a tuple of (document, partition key) as below.
+by a tuple of (document, partition key value) as below.
 
 ```python
 docs = [

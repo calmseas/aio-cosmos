@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "aio-cosmos"
-version = "0.2.2"
+version = "0.2.3"
 description = "Ayncio Client for Azure Cosmos DB"
 authors = ["Grant McDonald <calmseasdev@gmail.com>"]
 keywords = ["azure","cosmos","ayncio","aio","nosql"]
