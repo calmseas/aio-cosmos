@@ -24,8 +24,8 @@ async def test_create_db():
     key = os.getenv('MASTER_KEY')
     endpoint = os.getenv('ENDPOINT')
 
-    async with get_client(endpoint, key) as client:
-        number = 80
+    async with get_client(endpoint, key, raise_on_failure=False) as client:
+        number = 81
         print(await client.create_database(f'test-db-async-{number}'))
         await client.create_container(f'test-db-async-{number}', 'test-container-async', '/account')
         doc_id = str(uuid4())
@@ -44,7 +44,7 @@ async def test_create_db():
 
         import time
         start = time.time()
-        res = await client.create_documents(f'test-db-async-{number}', 'test-container-async', docs)
+        res = await client.create_documents(f'test-db-async-2-{number}', 'test-container-async', docs)
         print(f'time to save five docs: {time.time() - start}s')
         print(res)
 

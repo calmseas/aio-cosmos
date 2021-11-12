@@ -60,7 +60,7 @@ async def on_request_end(session, trace_config_ctx, params):
 
 class CosmosClient:
 
-    def __init__(self, endpoint: str, master_key: str, debug=True):
+    def __init__(self, endpoint: str, master_key: str, debug: bool = True, raise_on_failure: bool = True):
         self.endpoint = endpoint if endpoint.endswith('/') else endpoint + '/'
         self.writable_endpoints = [{'databaseAccountEndpoint': self.endpoint}]
         self.readable_endpoints = [{'databaseAccountEndpoint': self.endpoint}]
@@ -68,19 +68,19 @@ class CosmosClient:
         self.master_key = master_key
         trace_config = aiohttp.TraceConfig()
         trace_config.on_request_end.append(on_request_end)
+        trace_configs = [trace_config] if debug else None
         connector = aiohttp.TCPConnector(ssl=False) if debug else aiohttp.TCPConnector()
         self.session = aiohttp.ClientSession(raise_for_status=False, connector=connector, trace_configs=[trace_config])
         self.session_token = None
+        self.raise_on_failure = raise_on_failure
 
     async def connect(self):
         headers = self._get_headers(http_constants.HttpMethods.Get, None, "")
 
         async with self.session.get(self.endpoint, headers=headers) as response:
-            print(f'response.headers: {response.headers} ')
             self.server_details = await response.json()
             self.writable_endpoints = self.server_details['writableLocations']
             self.readable_endpoints = self.server_details['readableLocations']
-            print(self.server_details)
 
     async def close(self):
         await self.session.close()
@@ -138,10 +138,11 @@ class CosmosClient:
                                error_message: str,
                                manage_session: bool = False,
                                subkey: Optional[str] = None):
-        if response.status >= 400:
-            json = await response.json()
-            raise CosmosError(response.status, json, error_message)
         data = await response.json()
+
+        if response.status >= 400 and self.raise_on_failure:
+            if self.raise_on_failure:
+                raise CosmosError(response.status, data, error_message)
 
         session_token = None
         if manage_session:
@@ -149,9 +150,10 @@ class CosmosClient:
             session_token = self.session_token
 
         return {
-            'status': 'ok',
+            'status': 'failed' if response.status >= 400 else 'ok',
             'code': response.status,
             'session_token': session_token,
+            'error': error_message if response.status >= 400 else None,
             'data': data[subkey] if subkey is not None else data
         }
 
@@ -308,8 +310,8 @@ class CosmosClient:
 
 
 @asynccontextmanager
-async def get_client(endpoint: str, key: str, debug: bool = False) -> CosmosClient:
-    client = CosmosClient(endpoint, key, debug)
+async def get_client(endpoint: str, key: str, debug: bool = False, raise_on_failure: bool = False) -> CosmosClient:
+    client = CosmosClient(endpoint, key, debug, raise_on_failure)
     await client.connect()
     try:
         yield client

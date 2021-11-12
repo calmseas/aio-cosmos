@@ -1,8 +1,17 @@
 [tool.poetry]
 name = "aio-cosmos"
-version = "0.1.0"
+version = "0.2.0"
 description = "Ayncio Client for Azure Cosmos DB"
-authors = ["Grant McDonald <https://github.com/calmseas>"]
+authors = ["Grant McDonald <calmseasdev@gmail.com>"]
+keywords = ["azure","cosmos","ayncio","aio","nosql"]
+readme = "README.md"
+license = "MIT"
+homepage = "https://github.com/calmseas/aio-cosmos"
+repository = "https://github.com/calmseas/aio-cosmos"
+include = [
+    "LICENSE"
+]
+
 
 [tool.poetry.dependencies]
 python = "^3.7"
