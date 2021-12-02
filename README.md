@@ -34,6 +34,9 @@ the appropriate methods. This facilitates sending the token value back to an end
 session cookie so that writes and reads can maintain consistency across multiple instances of
 Cosmos.
 
+There is currently no retry policy on failed connections/broken connections and this must be entirely
+managed by the end user code. This may be implemented in the future
+
 ## Installation
 
 ```shell
@@ -91,7 +94,7 @@ res = await client.create_documents(f'database-name', 'container-name', docs)
 
 ### Results
 
-Results are returned in a dictionary of the following format:
+Results are returned in a dictionary with the following format:
 
 ```python
 {
@@ -102,10 +105,10 @@ Results are returned in a dictionary of the following format:
     'data': Union[dict,list]
 }
 ```
-status will be either 'ok' or 'failed'
-code is the integer HTTP response code
-session_token is the string session code vector returned by Cosmos
-error is a string error message to provide context to a failed status
-data is either the data or error return of the operation from Cosmos
+- status will be either 'ok' or 'failed'
+- code is the integer HTTP response code
+- session_token is the string session code vector returned by Cosmos
+- error is a string error message to provide context to a failed status
+- data is the direct JSON response from Cosmos and will contain any error information in the case of failed operations
 
-Note, to see an error return in the above format you must pass ```raise_on_failure=False``` to the client instantiation.
+Note, to see an error return in the above format you must pass ```raise_on_failure=False``` to the client constructor.

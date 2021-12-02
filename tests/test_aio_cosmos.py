@@ -1,4 +1,6 @@
-from aio_cosmos import __version__
+import datetime
+
+from aio_cosmos import __version__, auth
 from aio_cosmos.client import CosmosClient, get_client
 import os
 import pytest
@@ -8,19 +10,35 @@ from azure.cosmos import PartitionKey, ContainerProxy, CosmosClient as cc
 from uuid import uuid4
 
 def test_version():
-    assert __version__ == '0.2.2'
+    assert __version__ == '0.2.4'
+
+def test_auth():
+    key = os.getenv('MASTER_KEY')
+    endpoint = os.getenv('ENDPOINT')
+    headers = {
+        'x-ms-date': datetime.datetime.utcnow().strftime("tue, 16 nov 2021 22:59:49 gmt")
+    }
+    import time
+    start = time.time()
+    print(auth.get_authorization_header("GET", "/dbs", "dbs", headers, key))
+    end = time.time()
+    print(f'duration of hmac: {round((end - start)*1000000, 3)}µs')
+
 
 @pytest.mark.asyncio
-async def i_test_list_db():
+async def i_test_delete_db():
     key = os.getenv('MASTER_KEY')
     endpoint = os.getenv('ENDPOINT')
 
     async with get_client(endpoint, key) as client:
         databases = await client.list_databases()
-        print(databases)
+        for database in databases['data']['Databases']:
+            print(f'deleting {database["id"]}')
+            res = await client.delete_database(database["id"])
+            print(f'result: {res["status"]} --> {res["code"]}')
 
 @pytest.mark.asyncio
-async def test_create_db():
+async def i_test_create_db():
     key = os.getenv('MASTER_KEY')
     endpoint = os.getenv('ENDPOINT')
 

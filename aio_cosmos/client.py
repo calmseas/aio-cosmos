@@ -40,7 +40,7 @@ DEFAULT_HEADERS = {
 }
 
 
-def is_master_resouce(resourceType):
+def is_master_resource(resourceType):
     return resourceType in (
         http_constants.ResourceType.Offer,
         http_constants.ResourceType.Database,
@@ -66,13 +66,15 @@ class CosmosClient:
         self.readable_endpoints = [{'databaseAccountEndpoint': self.endpoint}]
         self.server_details = None
         self.master_key = master_key
-        trace_config = aiohttp.TraceConfig()
-        trace_config.on_request_end.append(on_request_end)
-        trace_configs = [trace_config] if debug else None
-        connector = aiohttp.TCPConnector(ssl=False) if debug else aiohttp.TCPConnector()
-        self.session = aiohttp.ClientSession(raise_for_status=False, connector=connector, trace_configs=[trace_config])
         self.session_token = None
         self.raise_on_failure = raise_on_failure
+        if debug:
+            trace_config = aiohttp.TraceConfig()
+            trace_config.on_request_end.append(on_request_end)
+            connector = aiohttp.TCPConnector(ssl=False)
+            self.session = aiohttp.ClientSession(raise_for_status=False, connector=connector, trace_configs=[trace_config])
+        else:
+            self.session = aiohttp.ClientSession(raise_for_status=False)
 
     async def connect(self):
         headers = self._get_headers(http_constants.HttpMethods.Get, None, "")
@@ -103,16 +105,16 @@ class CosmosClient:
                      session_token: Optional[str] = None):
         headers = DEFAULT_HEADERS.copy()
 
-        if session_token is not None and not is_master_resouce(resource_type):
+        if session_token is not None and not is_master_resource(resource_type):
             headers[http_constants.HttpHeaders.SessionToken] = session_token
 
         if method in (http_constants.HttpMethods.Put, http_constants.HttpMethods.Post) and is_query:
             headers[http_constants.HttpHeaders.ContentType] = 'application/query+json'
-            headers[http_constants.HttpHeaders.IsQuery] = "True"
+            headers[http_constants.HttpHeaders.IsQuery] = str(is_query)
             del headers[http_constants.HttpHeaders.IsContinuationExpected]
 
         if upsert:
-            headers[http_constants.HttpHeaders.IsUpsert] = upsert
+            headers[http_constants.HttpHeaders.IsUpsert] = str(upsert)
 
         if indexed is not None:
             headers[http_constants.HttpHeaders.IndexingDirective] = "Include" if indexed else "Exclude"

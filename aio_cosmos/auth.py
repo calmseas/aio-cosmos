@@ -30,7 +30,7 @@ from urllib.parse import quote
 from . import http_constants
 
 
-def get_authorization_header(verb, resource_id_or_fullname, resource_type, headers, master_key: str):
+def get_authorization_header(verb, resource_id_or_fullname, resource_type, headers: dict, master_key: str):
 
     return __get_authorization_token_using_master_key(
         verb, resource_id_or_fullname, resource_type, headers, master_key
@@ -67,9 +67,7 @@ def __get_authorization_token_using_master_key(verb, resource_id_or_fullname, re
     digest = hmac.new(key, body, sha256).digest()
     signature = base64.encodebytes(digest).decode("utf-8")
 
-    master_token = "master"
-    token_version = "1.0"
-    sig = "type={type}&ver={ver}&sig={sig}".format(type=master_token, ver=token_version, sig=signature[:-1])
+    sig = "type=master&ver=1.0&sig={sig}".format(sig=signature[:-1])
     # -_.!~*'() are valid characters in url, and shouldn't be quoted.
     sig = quote(sig, "-_.!~*'()")
     return sig
