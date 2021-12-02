@@ -112,7 +112,7 @@ class CosmosClient:
             del headers[http_constants.HttpHeaders.IsContinuationExpected]
 
         if upsert:
-            headers[http_constants.HttpHeaders.IsUpsert] = upsert
+            headers[http_constants.HttpHeaders.IsUpsert] = str(upsert)
 
         if indexed is not None:
             headers[http_constants.HttpHeaders.IndexingDirective] = "Include" if indexed else "Exclude"
